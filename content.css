@@ -1,0 +1,1140 @@
+/* ============================================
+   iStar · 多主题便签 UI
+   所有样式在 closed Shadow DOM 内生效
+   ============================================ */
+
+/* ---- 基础变量 ---- */
+:host {
+  --istar-font: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --istar-font-mono: 'Courier New', 'SF Mono', Monaco, monospace;
+  --istar-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---- 重置（仅限 Shadow DOM 内） ---- */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ============================================
+   触发图标
+   ============================================ */
+.istar-trigger {
+  position: fixed;
+  z-index: 2147483646;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+  opacity: 0.2;
+  transition: all var(--istar-transition);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.istar-trigger:hover {
+  opacity: 0.95;
+  transform: scale(1.2);
+}
+
+.istar-trigger.top-right {
+  top: 12px;
+  right: 12px;
+}
+
+.istar-trigger.top-left {
+  top: 12px;
+  left: 12px;
+}
+
+.istar-trigger.bottom-right {
+  bottom: 12px;
+  right: 12px;
+}
+
+.istar-trigger.bottom-left {
+  bottom: 12px;
+  left: 12px;
+}
+
+/* 偏移模式：避开网站右上角头像区 */
+.istar-trigger.istar-offset.top-right,
+.istar-trigger.istar-offset.top-left {
+  top: 60px;
+}
+
+.istar-trigger.has-notes {
+  opacity: 0.45;
+}
+
+/* ============================================
+   面板基底
+   ============================================ */
+.istar-panel {
+  position: fixed;
+  z-index: 2147483647;
+  width: 320px;
+  min-width: 240px;
+  max-width: 560px;
+  min-height: 140px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--istar-font);
+  font-size: 13px;
+  opacity: 0;
+  transform: scale(0.92) translateY(-6px);
+  pointer-events: none;
+  transition: opacity 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  resize: both;
+  overflow: hidden;
+}
+
+.istar-panel.visible {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  pointer-events: all;
+}
+
+.istar-panel.top-right {
+  top: 56px;
+  right: 12px;
+}
+
+.istar-panel.top-left {
+  top: 56px;
+  left: 12px;
+}
+
+.istar-panel.bottom-right {
+  bottom: 56px;
+  right: 12px;
+}
+
+.istar-panel.bottom-left {
+  bottom: 56px;
+  left: 12px;
+}
+
+/* 偏移模式：面板位置同步下移 */
+.istar-panel.istar-offset.top-right,
+.istar-panel.istar-offset.top-left {
+  top: 100px;
+}
+
+/* ---- 顶栏 ---- */
+.istar-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: move;
+  user-select: none;
+  border-radius: 8px 8px 0 0;
+  min-height: 32px;
+}
+
+.istar-bar-domain {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+}
+
+.istar-bar-actions {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.istar-bar-btn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all var(--istar-transition);
+  opacity: 0.5;
+  line-height: 1;
+}
+
+.istar-bar-btn:hover {
+  opacity: 1;
+}
+
+.istar-bar-btn.active {
+  opacity: 1;
+}
+
+/* ---- 笔记区容器 ---- */
+.istar-note-wrap {
+  position: relative;
+  flex: 1;
+  min-height: 60px;
+  overflow-y: auto;
+}
+
+.istar-note-wrap::-webkit-scrollbar {
+  width: 3px;
+}
+
+.istar-note-wrap::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.istar-note-wrap::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 2px;
+}
+
+/* textarea 编辑区 */
+.istar-note-edit {
+  display: none;
+  width: 100%;
+  height: 100%;
+  min-height: 80px;
+  padding: 14px 16px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: inherit;
+  font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+  font-size: 12px;
+  line-height: 1.7;
+  resize: none;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.istar-note-edit::placeholder {
+  opacity: 0.35;
+  font-style: italic;
+}
+
+/* 渲染预览区 */
+.istar-note-render {
+  padding: 14px 16px;
+  line-height: 1.7;
+  word-break: break-word;
+  cursor: pointer;
+  min-height: 60px;
+  font-size: 13px;
+}
+
+.istar-note-render.empty {
+  min-height: 60px;
+}
+
+.istar-placeholder {
+  opacity: 0.35;
+  font-style: italic;
+}
+
+/* ---- Markdown 渲染样式 ---- */
+.istar-note-render .istar-h2 {
+  margin: 0 0 8px;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.4;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  padding-bottom: 4px;
+}
+
+.istar-note-render .istar-h3 {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.istar-note-render .istar-h4 {
+  margin: 0 0 4px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.istar-note-render .istar-p {
+  margin: 0 0 6px;
+  line-height: 1.7;
+}
+
+.istar-note-render .istar-p:last-child {
+  margin-bottom: 0;
+}
+
+.istar-note-render .istar-list {
+  margin: 0 0 8px;
+  padding-left: 18px;
+}
+
+.istar-note-render .istar-list li {
+  margin-bottom: 3px;
+  line-height: 1.6;
+}
+
+.istar-note-render .istar-inline-code {
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.06);
+  font-family: 'SF Mono', 'Menlo', monospace;
+  font-size: 0.9em;
+}
+
+.istar-note-render .istar-code-block {
+  margin: 6px 0;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.05);
+  font-family: 'SF Mono', 'Menlo', monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
+
+.istar-note-render .istar-code-block code {
+  background: none;
+  padding: 0;
+}
+
+.istar-note-render .istar-tag {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  font-size: 0.85em;
+  font-weight: 500;
+}
+
+.istar-note-render .istar-link {
+  color: #3b82f6;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.istar-note-render .istar-link:hover {
+  border-bottom-color: #3b82f6;
+}
+
+.istar-note-render strong {
+  font-weight: 700;
+}
+
+.istar-note-render em {
+  font-style: italic;
+}
+
+/* ---- 风格选择弹出 ---- */
+.istar-picker {
+  position: absolute;
+  top: 36px;
+  right: 8px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 6px;
+  display: none;
+  z-index: 100;
+  width: 170px;
+}
+
+.istar-picker.show {
+  display: block;
+}
+
+.istar-picker-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: var(--istar-font);
+  color: #374151;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.istar-picker-item:hover {
+  background: #f3f4f6;
+}
+
+.istar-picker-item.active {
+  background: #eef2ff;
+  color: #6366f1;
+  font-weight: 600;
+}
+
+.istar-picker-emoji {
+  font-size: 15px;
+  width: 22px;
+  text-align: center;
+}
+
+/* ---- 日期标签 ---- */
+.istar-date {
+  font-size: 10px;
+  opacity: 0.4;
+  padding: 4px 16px 8px;
+  text-align: right;
+}
+
+/* ============================================
+   主题 1：经典便签 (Sticky)
+   淡黄纸张 + 胶带 + 微旋转
+   ============================================ */
+.istar-panel[data-theme="sticky"] {
+  background: #fff9c4;
+  border: none;
+  box-shadow: 2px 4px 16px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08);
+  border-radius: 2px;
+  transform-origin: top center;
+  color: #3e2723;
+}
+
+.istar-panel[data-theme="sticky"].visible {
+  transform: rotate(-0.8deg) scale(1);
+}
+
+/* 胶带装饰 */
+.istar-panel[data-theme="sticky"]::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%) rotate(1deg);
+  width: 60px;
+  height: 22px;
+  background: linear-gradient(135deg, rgba(200, 200, 180, 0.55), rgba(220, 218, 200, 0.45));
+  border-radius: 2px;
+  z-index: 2;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+/* 纸张纹理 */
+.istar-panel[data-theme="sticky"]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg,
+      transparent,
+      transparent 27px,
+      rgba(180, 160, 100, 0.08) 27px,
+      rgba(180, 160, 100, 0.08) 28px);
+  pointer-events: none;
+  border-radius: 2px;
+}
+
+.istar-panel[data-theme="sticky"] .istar-bar {
+  background: transparent;
+  color: #5d4037;
+  border-bottom: 1px dashed rgba(121, 85, 72, 0.15);
+  border-radius: 2px 2px 0 0;
+}
+
+.istar-panel[data-theme="sticky"] .istar-bar-btn {
+  color: #8d6e63;
+}
+
+.istar-panel[data-theme="sticky"] .istar-note-wrap {
+  color: #4e342e;
+  font-size: 14px;
+}
+
+.istar-panel[data-theme="sticky"] .istar-note-render.empty {
+  color: #a1887f;
+}
+
+.istar-panel[data-theme="sticky"] .istar-date {
+  color: #a1887f;
+}
+
+/* ============================================
+   主题 2：牛皮纸 (Craft)
+   档案文件夹风格 + 图钉
+   ============================================ */
+.istar-panel[data-theme="craft"] {
+  background: linear-gradient(165deg, #e8d5b5, #d4b896, #c9a97a);
+  border: none;
+  box-shadow: 3px 5px 20px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+  color: #3e2723;
+}
+
+/* 图钉 */
+.istar-panel[data-theme="craft"]::before {
+  content: '📌';
+  position: absolute;
+  top: -8px;
+  right: 24px;
+  font-size: 20px;
+  z-index: 2;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.2));
+  transform: rotate(15deg);
+}
+
+/* 纸张内页 */
+.istar-panel[data-theme="craft"]::after {
+  content: '';
+  position: absolute;
+  top: 32px;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  background: linear-gradient(to bottom, #faf6f0, #f5efe5);
+  border-radius: 2px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06);
+  pointer-events: none;
+}
+
+.istar-panel[data-theme="craft"] .istar-bar {
+  background: transparent;
+  color: #5d4037;
+  border-bottom: none;
+  position: relative;
+  z-index: 1;
+  border-radius: 3px 3px 0 0;
+}
+
+.istar-panel[data-theme="craft"] .istar-bar-btn {
+  color: #795548;
+}
+
+.istar-panel[data-theme="craft"] .istar-note-wrap {
+  position: relative;
+  z-index: 1;
+  color: #4e342e;
+  margin: 0 12px 12px;
+  background: linear-gradient(to bottom, #faf6f0, #f5efe5);
+  border-radius: 2px;
+  font-size: 13px;
+  line-height: 1.8;
+  min-height: 70px;
+}
+
+.istar-panel[data-theme="craft"] .istar-note-render.empty {
+  color: #a1887f;
+}
+
+.istar-panel[data-theme="craft"] .istar-date {
+  position: relative;
+  z-index: 1;
+  color: #8d6e63;
+  padding: 0 16px 10px;
+}
+
+/* ============================================
+   主题 3：打字机 (Typewriter)
+   白纸 + 等宽字体 + 穿孔边 + 虚线
+   ============================================ */
+.istar-panel[data-theme="typewriter"] {
+  background: #fefefe;
+  border: 1px solid #e0e0e0;
+  box-shadow: 2px 3px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 0;
+  color: #222;
+  border-top: 12px solid #f0ebe3;
+}
+
+/* 左侧穿孔 */
+.istar-panel[data-theme="typewriter"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 16px;
+  bottom: 0;
+  width: 1px;
+  background: repeating-linear-gradient(to bottom,
+      transparent,
+      transparent 14px,
+      #d4c5b0 14px,
+      #d4c5b0 18px);
+  z-index: 1;
+}
+
+/* 横线 */
+.istar-panel[data-theme="typewriter"]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(to bottom,
+      transparent,
+      transparent 25px,
+      #e8e0d4 25px,
+      #e8e0d4 26px);
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.istar-panel[data-theme="typewriter"] .istar-bar {
+  background: #f0ebe3;
+  color: #555;
+  border-bottom: 2px solid #d4c5b0;
+  border-radius: 0;
+  font-family: var(--istar-font-mono);
+  letter-spacing: 0.5px;
+  font-size: 10px;
+}
+
+.istar-panel[data-theme="typewriter"] .istar-bar-btn {
+  color: #888;
+}
+
+.istar-panel[data-theme="typewriter"] .istar-note-wrap {
+  position: relative;
+  z-index: 1;
+  color: #333;
+  font-family: var(--istar-font-mono);
+  font-size: 13px;
+  line-height: 26px;
+  letter-spacing: 0.3px;
+}
+
+.istar-panel[data-theme="typewriter"] .istar-note-render.empty {
+  color: #bbb;
+  font-family: var(--istar-font-mono);
+}
+
+.istar-panel[data-theme="typewriter"] .istar-date {
+  position: relative;
+  z-index: 1;
+  font-family: var(--istar-font-mono);
+  color: #aaa;
+  letter-spacing: 1px;
+}
+
+/* ============================================
+   主题 4：笔记本 (Notebook)
+   活页本 + 红色边线 + 左侧装订孔
+   ============================================ */
+.istar-panel[data-theme="notebook"] {
+  background: #fff;
+  border: 1px solid #ddd;
+  box-shadow: 3px 3px 12px rgba(0, 0, 0, 0.08), -1px 0 0 #ccc;
+  border-radius: 0 6px 6px 0;
+  color: #333;
+  padding-left: 32px;
+}
+
+/* 装订孔 */
+.istar-panel[data-theme="notebook"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 32px;
+  background: linear-gradient(to right, #f0f0f0, #e8e8e8);
+  border-right: 2px solid #ef4444;
+  z-index: 1;
+  border-radius: 0;
+}
+
+/* 在装订孔区域打孔 */
+.istar-panel[data-theme="notebook"]::after {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 20px;
+  bottom: 20px;
+  width: 12px;
+  background: repeating-linear-gradient(to bottom,
+      transparent,
+      transparent 30px,
+      #fff 30px,
+      #fff 36px,
+      transparent 36px,
+      transparent 40px);
+  z-index: 2;
+  border-radius: 0;
+}
+
+/* 横线 */
+.istar-panel[data-theme="notebook"] .istar-note-wrap {
+  position: relative;
+  color: #333;
+  font-size: 14px;
+  line-height: 28px;
+  background: repeating-linear-gradient(to bottom,
+      transparent,
+      transparent 27px,
+      #e0e7ff 27px,
+      #e0e7ff 28px);
+}
+
+.istar-panel[data-theme="notebook"] .istar-bar {
+  background: transparent;
+  color: #6366f1;
+  border-bottom: 1px solid #e5e7eb;
+  border-radius: 0 6px 0 0;
+  font-weight: 700;
+}
+
+.istar-panel[data-theme="notebook"] .istar-bar-btn {
+  color: #6366f1;
+}
+
+.istar-panel[data-theme="notebook"] .istar-note-render.empty {
+  color: #c7d2fe;
+}
+
+.istar-panel[data-theme="notebook"] .istar-date {
+  color: #a5b4fc;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* ============================================
+   主题 5：毛玻璃 (Glass) — 默认
+   ============================================ */
+.istar-panel[data-theme="glass"] {
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  color: #1a1a2e;
+}
+
+.istar-panel[data-theme="glass"] .istar-bar {
+  background: transparent;
+  color: #374151;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 14px 14px 0 0;
+}
+
+.istar-panel[data-theme="glass"] .istar-bar-btn {
+  color: #6b7280;
+}
+
+.istar-panel[data-theme="glass"] .istar-bar-btn:hover {
+  color: #6366f1;
+}
+
+.istar-panel[data-theme="glass"] .istar-note-wrap {
+  color: #1f2937;
+  font-size: 13px;
+}
+
+.istar-panel[data-theme="glass"] .istar-note-render.empty {
+  color: #9ca3af;
+}
+
+.istar-panel[data-theme="glass"] .istar-date {
+  color: #9ca3af;
+}
+
+/* 暗色模式 Glass */
+@media (prefers-color-scheme: dark) {
+  .istar-panel[data-theme="glass"] {
+    background: rgba(30, 30, 40, 0.75);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    color: #e5e7eb;
+  }
+
+  .istar-panel[data-theme="glass"] .istar-bar {
+    color: #d1d5db;
+  }
+
+  .istar-panel[data-theme="glass"] .istar-bar-btn {
+    color: #9ca3af;
+  }
+
+  .istar-panel[data-theme="glass"] .istar-note-wrap {
+    color: #e5e7eb;
+  }
+
+  .istar-panel[data-theme="glass"] .istar-note-render.empty {
+    color: #6b7280;
+  }
+
+  /* picker 暗色 */
+  .istar-picker {
+    background: #1f1f2e;
+    border-color: #333;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  }
+
+  .istar-picker-item {
+    color: #d1d5db;
+  }
+
+  .istar-picker-item:hover {
+    background: #2a2a3a;
+  }
+
+  .istar-picker-item.active {
+    background: #1e1e35;
+    color: #818cf8;
+  }
+}
+
+/* ============================================
+   Markdown 渲染通用样式
+   ============================================ */
+.istar-note-wrap h2,
+.istar-note-wrap h3,
+.istar-note-wrap h4 {
+  font-weight: 700;
+  margin: 4px 0;
+}
+
+.istar-note-wrap h2 {
+  font-size: 16px;
+}
+
+.istar-note-wrap h3 {
+  font-size: 15px;
+}
+
+.istar-note-wrap h4 {
+  font-size: 14px;
+}
+
+.istar-note-wrap p {
+  margin-bottom: 4px;
+}
+
+.istar-note-wrap p:last-child {
+  margin-bottom: 0;
+}
+
+.istar-note-wrap ul,
+.istar-note-wrap ol {
+  padding-left: 18px;
+  margin: 4px 0;
+}
+
+.istar-note-wrap code {
+  background: rgba(99, 102, 241, 0.08);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-family: var(--istar-font-mono);
+}
+
+.istar-note-wrap pre {
+  background: rgba(99, 102, 241, 0.06);
+  padding: 8px 10px;
+  border-radius: 6px;
+  margin: 6px 0;
+  overflow-x: auto;
+  font-size: 12px;
+  font-family: var(--istar-font-mono);
+}
+
+.istar-note-wrap a {
+  color: #6366f1;
+  text-decoration: none;
+}
+
+.istar-note-wrap a:hover {
+  text-decoration: underline;
+}
+
+.istar-tag {
+  color: #6366f1;
+  font-weight: 500;
+}
+
+/* ============================================
+   主题 6：对话气泡 (Bubble)
+   白色卡片 + 底部三角尖角 + 圆形图钉 + 大投影
+   参考：Reminder 风格
+   ============================================ */
+.istar-panel[data-theme="bubble"] {
+  background: #ffffff;
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.06);
+  color: #333;
+  overflow: visible;
+  margin-bottom: 16px;
+}
+
+/* 底部三角尖角 */
+.istar-panel[data-theme="bubble"]::after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  left: 32px;
+  width: 0;
+  height: 0;
+  border-left: 14px solid transparent;
+  border-right: 14px solid transparent;
+  border-top: 14px solid #ffffff;
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.05));
+  z-index: 1;
+}
+
+/* 顶部圆形装饰钉 */
+.istar-panel[data-theme="bubble"]::before {
+  content: '📌';
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(135deg, #ff6b35, #f7931e);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  box-shadow: 0 3px 8px rgba(255, 107, 53, 0.35);
+  z-index: 3;
+  line-height: 30px;
+  text-align: center;
+}
+
+.istar-panel[data-theme="bubble"] .istar-bar {
+  background: transparent;
+  color: #555;
+  border-bottom: 1px solid #f0f0f0;
+  border-radius: 16px 16px 0 0;
+  padding-top: 18px;
+}
+
+.istar-panel[data-theme="bubble"] .istar-bar-btn {
+  color: #999;
+}
+
+.istar-panel[data-theme="bubble"] .istar-bar-btn:hover {
+  color: #ff6b35;
+}
+
+.istar-panel[data-theme="bubble"] .istar-note-wrap {
+  color: #333;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.istar-panel[data-theme="bubble"] .istar-note-render.empty {
+  color: #ccc;
+}
+
+.istar-panel[data-theme="bubble"] .istar-date {
+  color: #bbb;
+}
+
+/* ============================================
+   主题 7：票券 (Ticket)
+   半圆穿孔边缘 + 虚线分割 + 浅粉底
+   参考：优惠券/电影票风格
+   ============================================ */
+.istar-panel[data-theme="ticket"] {
+  background: #fef7f2;
+  border: 1.5px dashed #e8c9b8;
+  border-radius: 12px;
+  box-shadow: 2px 3px 12px rgba(0, 0, 0, 0.06);
+  color: #5d4037;
+  overflow: visible;
+}
+
+/* 左侧半圆穿孔 */
+.istar-panel[data-theme="ticket"]::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  background: inherit;
+  border-radius: 50%;
+  border: 1.5px dashed #e8c9b8;
+  box-shadow: inset 0 0 0 8px var(--istar-page-bg, #fff);
+  z-index: 2;
+}
+
+/* 右侧半圆穿孔 */
+.istar-panel[data-theme="ticket"]::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  background: inherit;
+  border-radius: 50%;
+  border: 1.5px dashed #e8c9b8;
+  box-shadow: inset 0 0 0 8px var(--istar-page-bg, #fff);
+  z-index: 2;
+}
+
+.istar-panel[data-theme="ticket"] .istar-bar {
+  background: transparent;
+  color: #8d6e63;
+  border-bottom: 1.5px dashed #e8c9b8;
+  border-radius: 12px 12px 0 0;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.istar-panel[data-theme="ticket"] .istar-bar-btn {
+  color: #bcaaa4;
+}
+
+.istar-panel[data-theme="ticket"] .istar-bar-btn:hover {
+  color: #d84315;
+}
+
+.istar-panel[data-theme="ticket"] .istar-note-wrap {
+  color: #4e342e;
+  font-size: 13px;
+  line-height: 1.8;
+  /* 左侧竖线装饰 */
+  border-left: 3px solid #ef9a9a;
+  margin-left: 16px;
+  margin-right: 16px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  border-radius: 0;
+}
+
+.istar-panel[data-theme="ticket"] .istar-note-render.empty {
+  color: #d7ccc8;
+}
+
+.istar-panel[data-theme="ticket"] .istar-date {
+  color: #bcaaa4;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ============================================
+   主题 8：剪报 (Clipping)
+   撕纸锯齿边缘 + 红色图钉 + 方格纸背景 + 微旋转
+   参考：布告栏/剪贴板风格
+   ============================================ */
+.istar-panel[data-theme="clipping"] {
+  background: #fdfaf5;
+  border: none;
+  box-shadow: 3px 4px 14px rgba(0, 0, 0, 0.1), 1px 1px 0 rgba(0, 0, 0, 0.03);
+  border-radius: 2px;
+  color: #3e2723;
+  overflow: visible;
+}
+
+.istar-panel[data-theme="clipping"].visible {
+  transform: rotate(0.6deg) scale(1);
+}
+
+/* 方格纸纹理 */
+.istar-panel[data-theme="clipping"]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(200, 180, 150, 0.08) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(200, 180, 150, 0.08) 1px, transparent 1px);
+  background-size: 18px 18px;
+  pointer-events: none;
+  border-radius: 2px;
+}
+
+/* 红色图钉 */
+.istar-panel[data-theme="clipping"]::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 28px;
+  width: 14px;
+  height: 14px;
+  background: radial-gradient(circle at 40% 35%, #ff5252, #c62828);
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(198, 40, 40, 0.4), inset 0 -1px 2px rgba(0, 0, 0, 0.2);
+  z-index: 3;
+}
+
+/* 底部撕纸效果 */
+.istar-panel[data-theme="clipping"] .istar-date {
+  position: relative;
+  color: #a1887f;
+  padding-bottom: 12px;
+}
+
+.istar-panel[data-theme="clipping"] .istar-date::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(135deg,
+      #fdfaf5 33.33%, transparent 33.33%, transparent 66.66%, #fdfaf5 66.66%);
+  background-size: 8px 6px;
+}
+
+.istar-panel[data-theme="clipping"] .istar-bar {
+  background: transparent;
+  color: #5d4037;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 2px 2px 0 0;
+  padding-top: 10px;
+}
+
+.istar-panel[data-theme="clipping"] .istar-bar-btn {
+  color: #8d6e63;
+}
+
+.istar-panel[data-theme="clipping"] .istar-bar-btn:hover {
+  color: #c62828;
+}
+
+.istar-panel[data-theme="clipping"] .istar-note-wrap {
+  position: relative;
+  z-index: 1;
+  color: #4e342e;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.istar-panel[data-theme="clipping"] .istar-note-render.empty {
+  color: #bcaaa4;
+}
+
+/* ============================================
+   过渡动画
+   ============================================ */
+@keyframes istar-bounceIn {
+  0% {
+    transform: scale(0.8) translateY(-10px);
+    opacity: 0;
+  }
+
+  60% {
+    transform: scale(1.03) translateY(2px);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}

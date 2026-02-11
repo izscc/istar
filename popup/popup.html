@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <title>iStar · 设置</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+  <div class="popup-container">
+    <!-- 头部 -->
+    <header class="popup-header">
+      <div class="popup-logo">
+        <span class="popup-logo-icon">📝</span>
+        <div>
+          <h1 class="popup-title">iStar</h1>
+          <p class="popup-subtitle">船仓网页便签</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- 标签页切换 -->
+    <nav class="popup-tabs">
+      <button class="popup-tab active" data-tab="notes">📋 笔记</button>
+      <button class="popup-tab" data-tab="settings">⚙️ 设置</button>
+    </nav>
+
+    <!-- 笔记总览 -->
+    <section class="popup-section" data-section="notes">
+      <div class="popup-search">
+        <input type="text" class="popup-search-input" placeholder="搜索所有笔记…" id="searchInput">
+      </div>
+      <div class="popup-domains" id="domainsList">
+        <!-- 动态渲染 -->
+      </div>
+      <div class="popup-actions-bar">
+        <button class="popup-btn secondary" id="exportBtn">📥 导出 Markdown</button>
+        <button class="popup-btn secondary" id="syncBtn">🔄 立即同步</button>
+      </div>
+    </section>
+
+    <!-- 设置 -->
+    <section class="popup-section hidden" data-section="settings">
+      <!-- 图标位置 -->
+      <div class="popup-group">
+        <label class="popup-label">📍 图标位置</label>
+        <div class="popup-position-grid" id="positionGrid">
+          <button class="popup-pos-btn" data-pos="top-left">↖ 左上</button>
+          <button class="popup-pos-btn active" data-pos="top-right">↗ 右上</button>
+          <button class="popup-pos-btn" data-pos="bottom-left">↙ 左下</button>
+          <button class="popup-pos-btn" data-pos="bottom-right">↘ 右下</button>
+        </div>
+      </div>
+
+      <!-- 展开模式 -->
+      <div class="popup-group">
+        <label class="popup-label">📖 默认展开模式</label>
+        <div class="popup-radio-group" id="displayMode">
+          <label class="popup-radio">
+            <input type="radio" name="displayMode" value="collapsed" checked>
+            <span class="popup-radio-mark"></span>
+            <span>📦 全局缩小</span>
+            <small>仅显示图标</small>
+          </label>
+          <label class="popup-radio">
+            <input type="radio" name="displayMode" value="expanded">
+            <span class="popup-radio-mark"></span>
+            <span>📖 全局展开</span>
+            <small>自动展开面板</small>
+          </label>
+          <label class="popup-radio">
+            <input type="radio" name="displayMode" value="personalized">
+            <span class="popup-radio-mark"></span>
+            <span>⭐ 个性化</span>
+            <small>仅收藏页面展开</small>
+          </label>
+        </div>
+      </div>
+
+      <!-- 同步方案 -->
+      <div class="popup-group">
+        <label class="popup-label">☁️ 云同步</label>
+        <select class="popup-select" id="syncProvider">
+          <option value="chrome">Chrome 同步（默认，零配置）</option>
+          <option value="drive">Google Drive（大容量）</option>
+          <option value="github">GitHub Gist（开发者）</option>
+          <option value="feishu">飞书多维表格（明文可查）</option>
+          <option value="none">仅本地</option>
+        </select>
+      </div>
+
+      <!-- GitHub 配置 -->
+      <div class="popup-group popup-github-config hidden" id="githubConfig">
+        <label class="popup-label">🔑 GitHub Token</label>
+        <input type="password" class="popup-input" id="githubToken" placeholder="ghp_xxxx（只需 gist 权限）">
+        <a class="popup-help-link" href="https://github.com/settings/tokens/new?scopes=gist&description=iStar"
+          target="_blank">→ 点击生成 Token</a>
+      </div>
+
+      <!-- 飞书配置 -->
+      <div class="popup-group popup-feishu-config hidden" id="feishuConfig">
+        <label class="popup-label">🔑 飞书应用凭据</label>
+        <input type="text" class="popup-input" id="feishuAppId" placeholder="App ID">
+        <input type="password" class="popup-input" id="feishuAppSecret" placeholder="App Secret">
+        <input type="text" class="popup-input" id="feishuAppToken" placeholder="多维表格 App Token">
+        <input type="text" class="popup-input" id="feishuTableId" placeholder="数据表 Table ID">
+      </div>
+
+      <!-- 保存 -->
+      <button class="popup-btn primary" id="saveSettings">保存设置</button>
+    </section>
+
+    <!-- 底部 -->
+    <footer class="popup-footer">
+      <span>iStar v1.0.0</span>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+
+</html>

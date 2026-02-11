@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iStar · 船仓网页便签</title>
+    <link rel="stylesheet" href="sidepanel.css">
+</head>
+
+<body>
+    <div class="sp-container">
+        <!-- 头部 -->
+        <header class="sp-header">
+            <div class="sp-logo">
+                <span class="sp-logo-icon">📝</span>
+                <div>
+                    <h1 class="sp-title">iStar</h1>
+                    <p class="sp-subtitle">船仓网页便签</p>
+                </div>
+            </div>
+            <div class="sp-header-actions">
+                <button class="sp-icon-btn" id="syncBtn" title="立即同步">🔄</button>
+                <button class="sp-icon-btn" id="exportBtn" title="导出 Markdown">📥</button>
+            </div>
+        </header>
+
+        <!-- 搜索 -->
+        <div class="sp-search">
+            <span class="sp-search-icon">🔍</span>
+            <input type="text" class="sp-search-input" placeholder="搜索所有笔记…" id="searchInput">
+            <button class="sp-search-clear hidden" id="searchClear">✕</button>
+        </div>
+
+        <!-- 标签页 -->
+        <nav class="sp-tabs">
+            <button class="sp-tab active" data-tab="notes">📋 全部笔记</button>
+            <button class="sp-tab" data-tab="settings">⚙️ 设置</button>
+        </nav>
+
+        <!-- ====== 笔记面板 ====== -->
+        <section class="sp-panel" data-panel="notes">
+            <div class="sp-notes-list" id="notesList">
+                <!-- 动态渲染 -->
+            </div>
+        </section>
+
+        <!-- ====== 设置面板 ====== -->
+        <section class="sp-panel hidden" data-panel="settings">
+            <!-- 图标位置 -->
+            <div class="sp-group">
+                <label class="sp-label">📍 图标位置</label>
+                <div class="sp-position-grid" id="positionGrid">
+                    <button class="sp-pos-btn" data-pos="top-left">↖ 左上</button>
+                    <button class="sp-pos-btn active" data-pos="top-right">↗ 右上</button>
+                    <button class="sp-pos-btn" data-pos="bottom-left">↙ 左下</button>
+                    <button class="sp-pos-btn" data-pos="bottom-right">↘ 右下</button>
+                </div>
+            </div>
+
+            <!-- 便签风格 -->
+            <div class="sp-group">
+                <label class="sp-label">🎨 便签风格</label>
+                <div class="sp-theme-grid" id="themeGrid">
+                    <button class="sp-theme-btn active" data-theme="sticky">
+                        <span class="sp-theme-icon">📌</span>
+                        <span>经典便签</span>
+                    </button>
+                    <button class="sp-theme-btn" data-theme="craft">
+                        <span class="sp-theme-icon">📋</span>
+                        <span>牛皮纸</span>
+                    </button>
+                    <button class="sp-theme-btn" data-theme="typewriter">
+                        <span class="sp-theme-icon">📃</span>
+                        <span>打字机</span>
+                    </button>
+                    <button class="sp-theme-btn" data-theme="notebook">
+                        <span class="sp-theme-icon">📒</span>
+                        <span>笔记本</span>
+                    </button>
+                    <button class="sp-theme-btn" data-theme="glass">
+                        <span class="sp-theme-icon">✨</span>
+                        <span>毛玻璃</span>
+                    </button>
+                    <button class="sp-theme-btn" data-theme="bubble">
+                        <span class="sp-theme-icon">💬</span>
+                        <span>对话气泡</span>
+                    </button>
+                    <button class="sp-theme-btn" data-theme="ticket">
+                        <span class="sp-theme-icon">🎫</span>
+                        <span>票券</span>
+                    </button>
+                    <button class="sp-theme-btn" data-theme="clipping">
+                        <span class="sp-theme-icon">📎</span>
+                        <span>剪报</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 展开模式 -->
+            <div class="sp-group">
+                <label class="sp-label">📖 默认展开模式</label>
+                <div class="sp-radio-group" id="displayMode">
+                    <label class="sp-radio">
+                        <input type="radio" name="displayMode" value="collapsed" checked>
+                        <span class="sp-radio-dot"></span>
+                        <div class="sp-radio-text">
+                            <span>📦 全局缩小</span>
+                            <small>所有页面仅显示图标</small>
+                        </div>
+                    </label>
+                    <label class="sp-radio">
+                        <input type="radio" name="displayMode" value="expanded">
+                        <span class="sp-radio-dot"></span>
+                        <div class="sp-radio-text">
+                            <span>📖 全局展开</span>
+                            <small>所有页面自动展开面板</small>
+                        </div>
+                    </label>
+                    <label class="sp-radio">
+                        <input type="radio" name="displayMode" value="personalized">
+                        <span class="sp-radio-dot"></span>
+                        <div class="sp-radio-text">
+                            <span>⭐ 个性化</span>
+                            <small>仅收藏页面展开（优先级最高）</small>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- 图标偏移域名 -->
+            <div class="sp-group">
+                <label class="sp-label">🎯 图标偏移域名</label>
+                <p class="sp-hint">以下网站的触发图标会自动下移，避免遮挡右上角头像。每行一个域名：</p>
+                <textarea class="sp-textarea" id="offsetDomains" rows="6" spellcheck="false"
+                    placeholder="github.com&#10;google.com&#10;chatgpt.com"></textarea>
+                <button class="sp-btn sp-btn-sm" id="saveOffsetDomains">💾 保存域名列表</button>
+            </div>
+
+            <!-- 同步方案 -->
+            <div class="sp-group">
+                <label class="sp-label">☁️ 云同步方案</label>
+                <select class="sp-select" id="syncProvider">
+                    <option value="chrome">Chrome 同步（默认零配置）</option>
+                    <option value="drive">Google Drive（一键授权，15GB）</option>
+                    <option value="github">GitHub Gist（开发者，加密）</option>
+                    <option value="feishu">飞书多维表格（明文可查）</option>
+                    <option value="none">仅本地存储</option>
+                </select>
+            </div>
+
+            <!-- GitHub 配置 -->
+            <div class="sp-group sp-config-section hidden" id="githubConfig">
+                <label class="sp-label">🔑 GitHub Personal Access Token</label>
+                <input type="password" class="sp-input" id="githubToken" placeholder="ghp_xxxx（只需 gist 权限）">
+                <a class="sp-help-link" href="https://github.com/settings/tokens/new?scopes=gist&description=iStar"
+                    target="_blank">→ 点击前往 GitHub 生成 Token</a>
+            </div>
+
+            <!-- 飞书配置 -->
+            <div class="sp-group sp-config-section hidden" id="feishuConfig">
+                <label class="sp-label">🔑 飞书应用凭据</label>
+                <input type="text" class="sp-input" id="feishuAppId" placeholder="App ID">
+                <input type="password" class="sp-input" id="feishuAppSecret" placeholder="App Secret">
+                <input type="text" class="sp-input" id="feishuAppToken" placeholder="多维表格 App Token">
+                <input type="text" class="sp-input" id="feishuTableId" placeholder="数据表 Table ID">
+            </div>
+
+            <button class="sp-btn-primary" id="saveSettings">保存设置</button>
+        </section>
+
+        <!-- Toast -->
+        <div class="sp-toast" id="toast"></div>
+
+        <!-- 开发者署名 -->
+        <footer class="sp-footer">
+            <span>开发者：<a href="https://zscc.in" target="_blank" rel="noopener">zscc.in</a></span>
+            <span class="sp-footer-sep">·</span>
+            <a href="https://zscc.in" target="_blank" rel="noopener">知识船仓·公益社区</a>
+            <span>出品</span>
+        </footer>
+    </div>
+
+    <script src="sidepanel.js"></script>
+</body>
+
+</html>

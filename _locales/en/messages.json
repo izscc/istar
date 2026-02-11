@@ -1,0 +1,10 @@
+{
+    "extName": {
+        "message": "iStar · Page Sticky Notes",
+        "description": "Extension name"
+    },
+    "extDescription": {
+        "message": "Lightweight, encrypted, cloud-synced sticky notes for every web page. Supports Markdown, multiple themes, GitHub/Feishu/Google Drive sync.",
+        "description": "Extension description"
+    }
+}

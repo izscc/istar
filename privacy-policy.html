@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iStar · 船仓网页便签 — 隐私政策</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background: #f9fafb;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: #111;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 32px;
+        }
+
+        h2 {
+            font-size: 18px;
+            margin: 28px 0 12px;
+            color: #222;
+        }
+
+        p,
+        li {
+            font-size: 15px;
+            margin-bottom: 10px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        .highlight {
+            background: #f0f7ff;
+            border-left: 3px solid #3b82f6;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin: 16px 0;
+        }
+
+        footer {
+            text-align: center;
+            color: #aaa;
+            font-size: 12px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔒 隐私政策</h1>
+        <p class="subtitle">iStar · 船仓网页便签 — Privacy Policy | 最后更新：2026-02-11</p>
+
+        <h2>1. 我们收集什么</h2>
+        <div class="highlight">
+            <strong>核心原则：iStar 不收集任何个人身份信息（PII），不追踪用户浏览行为。</strong>
+        </div>
+        <p>iStar 仅存储以下用户主动创建的数据：</p>
+        <ul>
+            <li><strong>便签内容</strong> — 用户在网页上手动输入的笔记文本</li>
+            <li><strong>关联页面 URL</strong> — 用于将便签与对应网页关联（仅存储域名和路径）</li>
+            <li><strong>用户偏好设置</strong> — 图标位置、主题风格、展开模式等配置项</li>
+        </ul>
+
+        <h2>2. 数据存储方式</h2>
+        <ul>
+            <li>所有便签数据使用 <strong>AES-256-GCM</strong> 算法加密后存储于 <code>chrome.storage.local</code></li>
+            <li>加密密钥自动生成，存储于 <code>chrome.storage.sync</code>（随 Chrome 账号同步）</li>
+            <li>数据默认仅保存在用户本地设备，<strong>不会自动上传到任何服务器</strong></li>
+        </ul>
+
+        <h2>3. 云同步（可选功能）</h2>
+        <p>用户可自行选择开启以下云同步方式，iStar 不会在未经授权的情况下传输数据：</p>
+        <ul>
+            <li><strong>Chrome Sync</strong> — 通过 Chrome 内置同步机制</li>
+            <li><strong>GitHub Gist</strong> — 用户提供 Personal Access Token，数据加密存储于私有 Gist</li>
+            <li><strong>Google Drive</strong> — 用户一键 OAuth 授权，数据加密存储于 appDataFolder</li>
+            <li><strong>飞书多维表格</strong> — 用户提供应用凭据，数据存储于指定表格</li>
+        </ul>
+        <p>同步的数据均为加密状态，第三方服务无法读取明文内容。</p>
+
+        <h2>4. 权限说明</h2>
+        <ul>
+            <li><strong>所有网站访问权限</strong> — 用于在每个网页注入便签浮窗（扩展核心功能）</li>
+            <li><strong>storage</strong> — 存储便签数据和用户设置</li>
+            <li><strong>contextMenus</strong> — 右键菜单"保存到 iStar"</li>
+            <li><strong>identity</strong> — Google Drive 同步时的 OAuth 授权（仅用户启用时触发）</li>
+            <li><strong>sidePanel</strong> — 展示便签管理侧边栏</li>
+        </ul>
+
+        <h2>5. 数据共享</h2>
+        <div class="highlight">
+            <strong>我们不会出售、交易或以任何方式向第三方转让用户数据。</strong>
+        </div>
+
+        <h2>6. 数据删除</h2>
+        <p>用户可随时：</p>
+        <ul>
+            <li>删除单条便签（清空内容即自动删除）</li>
+            <li>卸载扩展以完全清除所有本地数据</li>
+            <li>在 GitHub/Google Drive/飞书中手动删除云端同步数据</li>
+        </ul>
+
+        <h2>7. 联系方式</h2>
+        <p>如有隐私相关问题，请通过 GitHub Issues 联系我们。</p>
+
+        <footer>
+            <p>© 2026 iStar · 船仓网页便签 | All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+
+</html>

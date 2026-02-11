@@ -1,0 +1,10 @@
+{
+    "extName": {
+        "message": "iStar · 船仓网页便签",
+        "description": "扩展名称"
+    },
+    "extDescription": {
+        "message": "为每个网页提供轻量、加密、可云同步的便签备忘录。支持 Markdown、多主题、GitHub/飞书/Google Drive 同步。",
+        "description": "扩展描述"
+    }
+}
